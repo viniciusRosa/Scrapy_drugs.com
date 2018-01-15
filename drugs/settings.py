@@ -22,7 +22,7 @@ NEWSPIDER_MODULE = 'drugs.spiders'
 ROBOTSTXT_OBEY = True
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
-#CONCURRENT_REQUESTS = 32
+CONCURRENT_REQUESTS = 1
 
 # Configure a delay for requests for the same website (default: 0)
 # See https://doc.scrapy.org/en/latest/topics/settings.html#download-delay
@@ -67,6 +67,12 @@ ROBOTSTXT_OBEY = True
 #ITEM_PIPELINES = {
 #    'drugs.pipelines.DrugsPipeline': 300,
 #}
+
+ITEM_PIPELINES = {
+    'drugs.pipelines.JsonExportPipeline': 300,
+    'drugs.pipelines.CsvExportPipeline': 400,
+}
+
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://doc.scrapy.org/en/latest/topics/autothrottle.html

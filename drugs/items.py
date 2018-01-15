@@ -8,7 +8,7 @@
 import scrapy
 
 
-class DrugsItem(scrapy.Item):
+class DrugsSideEffectsItem(scrapy.Item):
     # define the fields for your item here like:
-    # name = scrapy.Field()
-    pass
+    drug_name = scrapy.Field()
+    drug_side_effects = scrapy.Field()
