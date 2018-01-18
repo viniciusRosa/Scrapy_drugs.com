@@ -1,9 +1,0 @@
->>> response.xpath('/html/body/div[1]/div/div[1]/div[2]/div[1]/div[2]/ul/li/a/@href').extract()
->>> response.xpath('/html/body/div[1]/div/div[1]/div[2]/div[1]/div[2]/ul/li/a/text()').extract()
-
->>> tbody = response.xpath('/html/body/div[1]/div/div[1]/div[2]/div[1]/div[2]/div[2]/table/tr/td[2]/a/text()')[-1].extract()
-
-/html/body/div[2]/div[1]/div[1]/div[2]/div[1]/div[2]/ul[1]
-
-response.css('.contentBox ul:not(.more-resources-list)>li::text')[0].extract()
-
