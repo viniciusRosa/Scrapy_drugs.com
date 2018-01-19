@@ -8,8 +8,8 @@ from scrapy.http import HtmlResponse
 class DrugsMainSpider(scrapy.Spider):
     name = 'drugs_main'
     allowed_domains = ['drugs.com']
-    #Reference link, this shows the side effects of medicines that start with letter 'a'
-    first_page_url = ('https://www.drugs.com/sfx-a{}.html')
+    #Reference link, this shows the side effects of medicines that start with letter 'b'
+    first_page_url = ('https://www.drugs.com/sfx-l{}.html')
 
     def __init__(self):
         self.last_page = None
@@ -25,8 +25,12 @@ class DrugsMainSpider(scrapy.Spider):
     def parse_page(self, response):
         """ get results of all pages that have will be scraped"""
         #get the last page
-        self.last_page = int(response.xpath('/html/body/div[1]/div/div[1]/div[2]/div[1]/div[2]/div[2]/table/tr/td[2]/a/text()')[-1].extract())
-        
+        page_list = response.selector.xpath('//div[@class="contentBox"]/div/table/tr')
+        if page_list:
+            self.last_page = int(response.xpath('/html/body/div[1]/div/div[1]/div[2]/div[1]/div[2]/div[2]/table/tr/td[2]/a/text()')[-1].extract())
+        else:
+            self.last_page = 1
+
         for page in range(self.last_page):
             request = scrapy.Request(
                 url=DrugsMainSpider.first_page_url.format(page),
@@ -46,7 +50,7 @@ class DrugsMainSpider(scrapy.Spider):
                 callback=self.parse_drugs_detail_description
             )
             yield request
-            
+
     def parse_drugs_detail_description(self, response):
         drugs_sfx_item = DrugsSideEffectsItem()
         drug_name = response.css('h1::text').extract_first()
