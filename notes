@@ -1,0 +1,12 @@
+len(t)
+8
+>>> f = response.selector.xpath('//div[@class="contentBox"]/p/text()')[2].extract()
+>>> type(f)
+<class 'str'>
+>>> while(num < len(t)):
+...     if response.selector.xpath('//div[@class="contentBox"]/p/text()')[num].extract() == 'Side effects include:':
+...             print(num)
+...             break
+...     num += 1
+... 
+3
