@@ -13,6 +13,7 @@ class DrugsDiseaseNameSpider(scrapy.Spider):
 
     def __init__(self):
         self.condition_name = None
+        self.diseage_medication_name = []
 
     """ get results of first page """
     def start_requests(self):
@@ -42,37 +43,48 @@ class DrugsDiseaseNameSpider(scrapy.Spider):
     def parse_page(self, response):
         condition_name = response.css('h1::text').extract_first()
         self.condition_name =  condition_name[19:]
-        diseage_medication_name = []
-        if response.selector.xpath('//div[@class="contentBox"]/div[@id="conditionBoxWrap"]'):
-            self.extract_medications(response, diseage_medication_name)
-
-
-
-    def extract_medications(self, response, diseage_medication_name):
-        # print('{} \n' .format(response.url))
+        medications = []
         pages = 1
-        if response.selector.xpath('//div[@class="contentBox"]/div[@id="conditionBoxWrap"]/div[@class="paging-list paging-list-condition-list"]'):
-            pages = int(response.css('td.paging-list-index:nth-child(2) a::text')[-1].extract())
+        if response.selector.xpath('//div[@class="contentBox"]/div[@id="conditionBoxWrap"]'):
+            if response.selector.xpath('//div[@class="contentBox"]/div[@id="conditionBoxWrap"]/div[@class="paging-list paging-list-condition-list"]'):
+                pages = int(response.css('td.paging-list-index:nth-child(2) a::text')[-1].extract())
+                print(pages)
+            else:
+                pages = 1
+                print(pages)
 
-        for page in range(1, pages + 1):
-            url_page = '{}?page_number={}' .format(response.url, page)
-            print('\n{} -> {}\n' .format(url_page, self.condition_name))
-            # request = scrapy.Request(
-            #     url=url_page,
-            #     callback=
-            # )
-    
+            for page in range(1, pages + 1):
+                try:
+                    url_page = '{}?page_number={}' .format(response.url, page)
+                    print('\n{}\n' .format(url_page))
+                    request = scrapy.Request(
+                        url=url_page,
+                        callback= self.parse_medications(response, medications)
+                    )
+                    yield request
+                except Exception as e:
+                    print("URL {}, generic error : {}".format(response.url, e))
+                    return
 
-#     def parse_drugs_detail_description(self, response):
-#         drugs_sfx_item = DrugsSideEffectsItem()
-#         drug_name = response.css('h1::text').extract_first()
-#         drugs_sfx = response.xpath('//div[@class="contentBox"]/ul/li')
+        else:
+            medications.append('none')
 
-#         drugs_sfx_item['drug_name'] = drug_name[:-13]
+        self.save_data(condition_name[19:], medications)
 
-#         if drugs_sfx.css('p'):
-#             drugs_sfx_item['drug_side_effects'] = response.xpath('//div[@class="contentBox"]/ul/li/p/text()').extract()
-#         else:
-#             drugs_sfx_item['drug_side_effects'] = response.xpath('//div[@class="contentBox"]/ul/li/text()').extract()
+   
+    def parse_medications(self, response, medications):
+        select_medication = response.xpath('//div[@class="contentBox"]/div[@id="conditionBoxWrap"]/table[@class="condition-table"]/tbody/tr/td/span/a[@class="condition-table__drug-name__link"]/text()').extract()
         
-#         yield drugs_sfx_item
+        for item in select_medication:
+            try:
+                medications.append(item)
+            except ValueError as e:
+                print("URL {}, error : {}".format(response.url, e))
+                return
+            except Exception as e:
+                print("URL {}, generic error : {}".format(response.url, e))
+                return
+
+    def save_data(self, name, medication_list):
+        print('{}' .format(name))
+        print('{}' .format(medication_list))

@@ -9,7 +9,7 @@ class DrugsMainSpider(scrapy.Spider):
     name = 'drugs_main'
     allowed_domains = ['drugs.com']
     #Reference link, this shows the side effects of medicines that start with letter 'b'
-    first_page_url = ('https://www.drugs.com/sfx-z{}.html')
+    first_page_url = ('https://www.drugs.com/sfx-{}.html')
 
     def __init__(self):
         self.last_page = None
