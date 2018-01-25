@@ -5,7 +5,6 @@ from drugs.items import DiseaseMedicinesItem
 from scrapy.selector import Selector
 from scrapy.http import HtmlResponse
 
-
 class DrugsDiseaseNameSpider(scrapy.Spider):
     name = 'drugs_disease_name'
     allowed_domains = ['drugs.com']
@@ -23,7 +22,6 @@ class DrugsDiseaseNameSpider(scrapy.Spider):
         )
         yield request
    
-
     def parse_diseage_link(self, response):
         results = response.xpath('//div[@class="contentBox"]/ul[@class="column-list-2"]/li/a/@href')
 
@@ -36,10 +34,6 @@ class DrugsDiseaseNameSpider(scrapy.Spider):
             )
             yield request
 
-
-
-     
-
     """ get results of all pages """
     def parse_page(self, response):
         condition_name = response.css('h1::text').extract_first()
@@ -49,10 +43,8 @@ class DrugsDiseaseNameSpider(scrapy.Spider):
         if response.selector.xpath('//div[@class="contentBox"]/div[@id="conditionBoxWrap"]'):
             if response.selector.xpath('//div[@class="contentBox"]/div[@id="conditionBoxWrap"]/div[@class="paging-list paging-list-condition-list"]'):
                 pages = int(response.css('td.paging-list-index:nth-child(2) a::text')[-1].extract())
-                # print(pages)
             else:
                 pages = 1
-                # print(pages)
 
             for page in range(1, pages + 1):
                 try:
@@ -63,11 +55,9 @@ class DrugsDiseaseNameSpider(scrapy.Spider):
                         callback= self.parse_medications(response, medications),
                         dont_filter = True
                     )
-                    # yield request
                 except Exception as e:
                     print("URL {}, generic error : {}".format(response.url, e))
                     return               
-
         else:
             medications.append('none')
 
@@ -81,15 +71,11 @@ class DrugsDiseaseNameSpider(scrapy.Spider):
         diseaseMedicineItem['medicine'] = medications
 
         yield diseaseMedicineItem
-        
-
    
     def parse_medications(self, response, medications):
         
         select_medication = response.xpath('//div[@class="contentBox"]/div[@id="conditionBoxWrap"]/table[@class="condition-table"]/tbody/tr/td/span/a[@class="condition-table__drug-name__link"]/text()')
 
-        # for med in select_medication:
-        #     print('{}\n' .format(med.extract()))
         for item in select_medication:
             try:
                self.diseage_medication_name.append(item)
@@ -100,16 +86,4 @@ class DrugsDiseaseNameSpider(scrapy.Spider):
             except Exception as e:
                 print("URL {}, generic error : {}".format(response.url, e))
                 return
-
-    # def save_data(self, name, medication_list):
-    #     diseaseMedicineItem = DiseaseMedicinesItem()
-
-    #     print('------------------------------------')
-    #     print('{} \n {}' .format(name, medication_list))
-    #     print('------------------------------------')
-
-    #     diseaseMedicineItem['disease'] = name
-    #     diseaseMedicineItem['medicine'] = medication_list
-
-    #     yield diseaseMedicineItem
 
