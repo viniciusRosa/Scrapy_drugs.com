@@ -9,7 +9,7 @@ from scrapy.http import HtmlResponse
 class DrugsDiseaseNameSpider(scrapy.Spider):
     name = 'drugs_disease_name'
     allowed_domains = ['drugs.com']
-    first_page_url = ('https://www.drugs.com/condition/{}.html')
+    first_page_url = ('https://www.drugs.com/condition/a.html')
 
     def __init__(self):
         self.condition_name = None
@@ -18,7 +18,7 @@ class DrugsDiseaseNameSpider(scrapy.Spider):
     """ get results of first page """
     def start_requests(self):
         request = scrapy.Request(
-            url=DrugsDiseaseNameSpider.first_page_url.format('a'),
+            url=DrugsDiseaseNameSpider.first_page_url.format(),
             callback=self.parse_diseage_link,
         )
         yield request
@@ -31,7 +31,8 @@ class DrugsDiseaseNameSpider(scrapy.Spider):
             url_disease = 'https://www.drugs.com' + disease_link.extract()           
             request = scrapy.Request(
                 url=url_disease,
-                callback=self.parse_page
+                callback=self.parse_page,
+                dont_filter = True
             )
             yield request
 
@@ -44,40 +45,46 @@ class DrugsDiseaseNameSpider(scrapy.Spider):
         condition_name = response.css('h1::text').extract_first()
         self.condition_name =  condition_name[19:]
         medications = []
-        pages = 1
+        pages = None
         if response.selector.xpath('//div[@class="contentBox"]/div[@id="conditionBoxWrap"]'):
             if response.selector.xpath('//div[@class="contentBox"]/div[@id="conditionBoxWrap"]/div[@class="paging-list paging-list-condition-list"]'):
                 pages = int(response.css('td.paging-list-index:nth-child(2) a::text')[-1].extract())
-                print(pages)
+                # print(pages)
             else:
                 pages = 1
-                print(pages)
+                # print(pages)
 
             for page in range(1, pages + 1):
                 try:
                     url_page = '{}?page_number={}' .format(response.url, page)
-                    print('\n{}\n' .format(url_page))
+                    print('\n{}' .format(url_page))
                     request = scrapy.Request(
                         url=url_page,
-                        callback= self.parse_medications(response, medications)
+                        callback= self.parse_medications(response, medications),
+                        dont_filter = True
                     )
-                    yield request
+                    # yield request
                 except Exception as e:
                     print("URL {}, generic error : {}".format(response.url, e))
-                    return
+                    return               
 
         else:
             medications.append('none')
+
 
         self.save_data(condition_name[19:], medications)
 
    
     def parse_medications(self, response, medications):
-        select_medication = response.xpath('//div[@class="contentBox"]/div[@id="conditionBoxWrap"]/table[@class="condition-table"]/tbody/tr/td/span/a[@class="condition-table__drug-name__link"]/text()').extract()
         
+        select_medication = response.xpath('//div[@class="contentBox"]/div[@id="conditionBoxWrap"]/table[@class="condition-table"]/tbody/tr/td/span/a[@class="condition-table__drug-name__link"]/text()')
+
+        # for med in select_medication:
+        #     print('{}\n' .format(med.extract()))
         for item in select_medication:
             try:
-                medications.append(item)
+               self.diseage_medication_name.append(item)
+               medications.append(item.extract())
             except ValueError as e:
                 print("URL {}, error : {}".format(response.url, e))
                 return
@@ -86,5 +93,7 @@ class DrugsDiseaseNameSpider(scrapy.Spider):
                 return
 
     def save_data(self, name, medication_list):
-        print('{}' .format(name))
-        print('{}' .format(medication_list))
+        print('------------------------------------')
+        print('{} \n {}' .format(name, medication_list))
+        print('------------------------------------')
+
