@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import scrapy
 import re
-from drugs.items import DrugsSideEffectsItem
+from drugs.items import DiseaseMedicinesItem
 from scrapy.selector import Selector
 from scrapy.http import HtmlResponse
 
@@ -71,8 +71,17 @@ class DrugsDiseaseNameSpider(scrapy.Spider):
         else:
             medications.append('none')
 
+        diseaseMedicineItem = DiseaseMedicinesItem()
 
-        self.save_data(condition_name[19:], medications)
+        print('------------------------------------')
+        print('{} \n {}' .format(condition_name[19:], medications))
+        print('------------------------------------')
+
+        diseaseMedicineItem['disease'] = condition_name[19:]
+        diseaseMedicineItem['medicine'] = medications
+
+        yield diseaseMedicineItem
+        
 
    
     def parse_medications(self, response, medications):
@@ -92,8 +101,15 @@ class DrugsDiseaseNameSpider(scrapy.Spider):
                 print("URL {}, generic error : {}".format(response.url, e))
                 return
 
-    def save_data(self, name, medication_list):
-        print('------------------------------------')
-        print('{} \n {}' .format(name, medication_list))
-        print('------------------------------------')
+    # def save_data(self, name, medication_list):
+    #     diseaseMedicineItem = DiseaseMedicinesItem()
+
+    #     print('------------------------------------')
+    #     print('{} \n {}' .format(name, medication_list))
+    #     print('------------------------------------')
+
+    #     diseaseMedicineItem['disease'] = name
+    #     diseaseMedicineItem['medicine'] = medication_list
+
+    #     yield diseaseMedicineItem
 
