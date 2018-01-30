@@ -12,3 +12,10 @@ class DrugsSideEffectsItem(scrapy.Item):
     # define the fields for your item here like:
     drug_name = scrapy.Field()
     drug_side_effects = scrapy.Field()
+
+class DiseaseMedicinesItem(scrapy.Item):
+    # define the fields for your item here like:
+    disease = scrapy.Field()
+    medicine = scrapy.Field()
+    amount = scrapy.Field()
+    # url = scrapy.Field()
