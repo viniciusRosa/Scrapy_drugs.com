@@ -8,7 +8,7 @@ from scrapy.http import HtmlResponse
 class DrugsDiseaseNameSpider(scrapy.Spider):
     name = 'drugs_disease_name'
     allowed_domains = ['drugs.com']
-    first_page_url = ('https://www.drugs.com/condition/z.html')
+    first_page_url = ('https://www.drugs.com/condition/a.html')
 
     def __init__(self):
         self.condition_name = None
@@ -59,14 +59,14 @@ class DrugsDiseaseNameSpider(scrapy.Spider):
             self.dict_result[condition_name[19:]] = ""
 
 
-        for item in self.dict_result:
-            
-            print('{} => {}' .format(item, self.dict_result[item]))
+        for num in range(0, len(self.dict_result)):
+            item = self.dict_result.popitem()
+            print('{} => {}' .format(item[0], item[1]))
 
-            diseaseMedicineItem['disease'] = item
-            diseaseMedicineItem['medicine'] = self.dict_result[item]
-            diseaseMedicineItem['amount'] = len(self.dict_result[item])
-   
+            diseaseMedicineItem['disease'] = item[0]
+            diseaseMedicineItem['medicine'] = item[1]
+            diseaseMedicineItem['amount'] = len(item[1])
+
             yield diseaseMedicineItem
 
     def parse_medications(self, response):
