@@ -65,7 +65,7 @@ class DrugsDiseaseNameSpider(scrapy.Spider):
 
             diseaseMedicineItem['disease'] = item[0]
             diseaseMedicineItem['medicine'] = item[1]
-            diseaseMedicineItem['amount'] = len(item[1])
+            # diseaseMedicineItem['amount'] = len(item[1])
 
             yield diseaseMedicineItem
 
